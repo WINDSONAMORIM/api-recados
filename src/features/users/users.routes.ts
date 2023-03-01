@@ -9,6 +9,8 @@ export const userRoutes = (router: Router) => {
 
   router.post("/users", validaDataUser, userController.createUser);
 
+  router.get("/users", userController.getUserAll);
+
   router.get("/users/:idUser", validaExistUser, userController.getUserId);
 
   router.put("/users/:idUser", validaExistUser, userController.editUser);

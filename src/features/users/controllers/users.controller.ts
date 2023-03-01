@@ -18,6 +18,12 @@ export class UserController {
     }
   }
 
+  getUserAll(response: Response) {
+    try {
+      return response.status(200).json({ body: listUsers.map((user) => user) });
+    } catch (error) {}
+  }
+
   getUserId(request: Request, response: Response) {
     try {
       const { idUser } = request.params;
