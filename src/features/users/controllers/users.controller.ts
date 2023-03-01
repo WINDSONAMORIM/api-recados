@@ -21,7 +21,11 @@ export class UserController {
   getUserAll(response: Response) {
     try {
       return response.status(200).json({ body: listUsers.map((user) => user) });
-    } catch (error) {}
+    } catch (error) {
+      return response.status(400).send({
+        message: error,
+      });
+    }
   }
 
   getUserId(request: Request, response: Response) {
