@@ -21,7 +21,7 @@ export class UserController {
   getUserAll(request: Request, response: Response) {
     try {
       const users = listUsers;
-      return response.status(200).json({ body: listUsers, users });
+      return response.json({ body: listUsers, users });
     } catch (error) {
       return response.status(400).send({
         message: error,
