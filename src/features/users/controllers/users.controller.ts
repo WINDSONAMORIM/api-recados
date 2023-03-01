@@ -18,7 +18,7 @@ export class UserController {
     }
   }
 
-  getUserAll(response: Response) {
+  getUserAll(request: Request, response: Response) {
     try {
       const users = listUsers;
       return response.status(200).json({ body: listUsers, users });
