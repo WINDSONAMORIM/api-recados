@@ -1,25 +1,29 @@
 import { Recado } from "../../../models/recado";
 import { listUsers } from "../../../database";
 import { User } from "../../../models/user";
-import { Request, Response } from "express";
+import { query, Request, Response } from "express";
+import { ResponseAPI } from "../../../types";
+import { send } from "process";
 
 export class RecadosController {
   createRecado(request: Request, response: Response) {
     try {
       const { idUser } = request.params;
-      const { description, detail } = request.body;
-
-      const newRecado = new Recado({ description, detail });
-
+      const { description, detail, archive } = request.body;
+      const newRecado = new Recado({ description, detail, archive });
       const index = listUsers.findIndex((user) => user.id === idUser);
-
       listUsers[index].recados.push(newRecado);
 
-      return response
-        .status(200)
-        .json({ body: newRecado, message: "message inserted successfully" });
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Recado cadastrado com sucesso.",
+        data: newRecado,
+      };
+
+      return response.status(200).send(resposta);
     } catch (error) {}
   }
+
   getRecadoId(request: Request, response: Response) {
     try {
       const { idUser, idRecado } = request.params;
@@ -27,27 +31,43 @@ export class RecadosController {
       const indexRecado = listUsers[indexUser].recados.findIndex(
         (recado) => recado.id === idRecado
       );
-      return response
-        .status(200)
-        .json({ body: listUsers[indexUser].recados[indexRecado] });
+
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Recado buscado com sucesso.",
+        data: listUsers[indexUser].recados[indexRecado],
+      };
+
+      return response.status(200).send(resposta);
     } catch (error) {}
   }
 
   getRecadoAll(request: Request, response: Response) {
     try {
       const { idUser } = request.params;
-      const user = listUsers.find((user) => user.id === idUser);
+      const { archive } = request.query;
+      const indexUser = listUsers.findIndex((user) => user.id === idUser);
+      const recadosFilter = listUsers[indexUser].recados.filter((recado) => {
+        if (archive) {
+          return recado.archive === Boolean(archive === "true" ? true : false);
+        }
+        return true;
+      });
 
-      return response
-        .status(200)
-        .json({ body: user?.recados.map((recado) => recado) });
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Recados buscados com sucesso.",
+        data: recadosFilter,
+      };
+
+      return response.status(200).send(resposta);
     } catch (error) {}
   }
 
   editRecado(request: Request, response: Response) {
     try {
       const { idUser, idRecado } = request.params;
-      const { detail, description } = request.body;
+      const { detail, description, archive } = request.body;
 
       const indexUser = listUsers.findIndex((user) => user.id === idUser);
       const indexRecado = listUsers[indexUser].recados.findIndex(
@@ -60,11 +80,16 @@ export class RecadosController {
         detail ?? oldRecado.detail;
       listUsers[indexUser].recados[indexRecado].description =
         description ?? oldRecado.description;
+      listUsers[indexUser].recados[indexRecado].archive =
+        archive ?? oldRecado.archive;
 
-      return response.status(200).json({
-        body: listUsers[indexUser].recados[indexRecado],
-        message: "Message changed successfully",
-      });
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Recado editado com sucesso.",
+        data: listUsers[indexUser].recados[indexRecado],
+      };
+
+      return response.status(200).json(resposta);
     } catch (error) {
       return response.status(400).send({
         message: error,
@@ -82,6 +107,17 @@ export class RecadosController {
       );
 
       listUsers[indexUser].recados.splice(indexRecado, 1);
-    } catch (error) {}
+
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Recado deletado com sucesso.",
+        data: listUsers[indexUser].recados[indexRecado],
+      };
+      return response.status(200).json(resposta);
+    } catch (error) {
+      return response.status(400).send({
+        message: error,
+      });
+    }
   }
 }

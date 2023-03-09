@@ -1,16 +1,22 @@
 import { Request, Response } from "express";
 import { listUsers } from "../../../database";
 import { User } from "../../../models/user";
+import { ResponseAPI } from "../../../types";
 
 export class UserController {
   createUser(request: Request, response: Response) {
     try {
       const { name, email, password } = request.body;
       const newUser = new User({ name, email, password });
+
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Usuário cadastrado com sucesso.",
+        data: listUsers,
+      };
+
       listUsers.push(newUser);
-      return response
-        .status(200)
-        .json({ body: newUser, message: "User created successfully" });
+      return response.status(200).send(resposta);
     } catch (error) {
       return response.status(400).send({
         message: error,
@@ -20,8 +26,12 @@ export class UserController {
 
   getUserAll(request: Request, response: Response) {
     try {
-      const users = listUsers;
-      return response.json({ body: listUsers, users });
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Usuários buscados com sucesso.",
+        data: listUsers,
+      };
+      return response.status(200).send(resposta);
     } catch (error) {
       return response.status(400).send({
         message: error,
