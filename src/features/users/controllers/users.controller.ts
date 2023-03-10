@@ -43,9 +43,13 @@ export class UserController {
     try {
       const { idUser } = request.params;
       const userFiltrado = listUsers.find((user) => user.id === idUser) as User;
-      return response
-        .status(200)
-        .json({ body: userFiltrado, message: "user found successfully" });
+
+      const resposta: ResponseAPI = {
+        success: true,
+        message: "Usuário buscados com sucesso",
+        data: userFiltrado,
+      };
+      return response.status(200).send(resposta);
     } catch (error) {
       return response.status(400).send({
         message: error,

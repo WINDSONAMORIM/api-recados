@@ -106,12 +106,15 @@ export class RecadosController {
         (recado) => recado.id === idRecado
       );
 
-      listUsers[indexUser].recados.splice(indexRecado, 1);
+      const [recadoDeletado] = listUsers[indexUser].recados.splice(
+        indexRecado,
+        1
+      );
 
       const resposta: ResponseAPI = {
         success: true,
         message: "Recado deletado com sucesso.",
-        data: listUsers[indexUser].recados[indexRecado],
+        data: recadoDeletado,
       };
       return response.status(200).json(resposta);
     } catch (error) {
